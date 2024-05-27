@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
+import { empresaSchema } from "./Empresa.js";
 
 const vestidoSchema = new mongoose.Schema({
     id: {type: ObjectId}, //id
@@ -14,9 +15,9 @@ const vestidoSchema = new mongoose.Schema({
     preco: {type: Number, required: true}, //PREÇO EM R$
     alugado: {type: Boolean, required: true}, // BOOLEAN APRA DIZER SE ESTÁ DISPONÍVEL OU NÃO
     images: {type: Array, required: true}, // array de string com a url das imagens
-    location_id: {type: ObjectId}, //objeto da empresa de locação
-    created_at:  {type: Date}, // data de criação formato 2024-01-01T00:00:00.000+00:00
-    updated_at: {type: Date} // data de modificação formato 2024-01-01T00:00:00.000+00:00
+    location_id: {type: ObjectId, ref: 'empresas', required: true}, //objeto da empresa de locação
+    created_at:  {type: Date, default: Date.now}, // data de criação formato 2024-01-01T00:00:00.000+00:00
+    updated_at: {type: Date, default: Date.now} // data de modificação formato 2024-01-01T00:00:00.000+00:00
 }, {versionKey: false});
 
 const vestido = mongoose.model("vestidos", vestidoSchema);
