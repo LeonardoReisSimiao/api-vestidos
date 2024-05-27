@@ -15,8 +15,13 @@ class UsuarioController {
 
   static async getUsuarioById(req, res) {
     try {
-      const id = await usuario.findById(req.params.id);
-      res.status(200).json(id);
+      const usuario = await usuario.findById(req.params.id);
+
+      if (!usuario) {
+        return res.status(404).json({ message: 'Usuário não encontrado' });
+      }
+
+      res.status(200).json(usuario);
     } catch (error) {
       res
         .status(500)
@@ -41,7 +46,12 @@ class UsuarioController {
 
   static async putUsuarioById(req, res) {
     try {
-      await usuario.findByIdAndUpdate(req.params.id, req.body);
+      const usuario = await usuario.findByIdAndUpdate(req.params.id, req.body);
+
+      if (!usuario) {
+        return res.status(404).json({ message: 'Usuário não encontrado' });
+      }
+
       res.status(200).send("Usuario atualizado com sucesso");
     } catch (error) {
       res
@@ -52,7 +62,12 @@ class UsuarioController {
 
   static async deleteUsuarioById(req, res) {
     try {
-      await usuario.findByIdAndDelete(req.params.id);
+      const usuario = await usuario.findByIdAndDelete(req.params.id);
+
+      if (!usuario) {
+        return res.status(404).json({ message: 'Usuário não encontrado' });
+      }
+
       res.status(200).send("Usuario excluído com sucesso");
     } catch (error) {
       res

@@ -15,8 +15,13 @@ class EmpresaController {
 
   static async getEmpresaById(req, res) {
     try {
-      const id = await empresa.findById(req.params.id);
-      res.status(200).json(id);
+      const empresa = await empresa.findById(req.params.id);
+
+      if (!empresa) {
+        return res.status(404).json({ message: 'Empresa não encontrada' });
+      }
+
+      res.status(200).json(empresa);
     } catch (error) {
       res
         .status(500)
@@ -41,7 +46,12 @@ class EmpresaController {
 
   static async putEmpresaById(req, res) {
     try {
-      await empresa.findByIdAndUpdate(req.params.id, req.body);
+      const empresa = await empresa.findByIdAndUpdate(req.params.id, req.body);
+
+      if (!empresa) {
+        return res.status(404).json({ message: 'Empresa não encontrada' });
+      }
+
       res.status(200).send("Empresa atualizado com sucesso");
     } catch (error) {
       res
@@ -52,7 +62,12 @@ class EmpresaController {
 
   static async deleteEmpresaById(req, res) {
     try {
-      await empresa.findByIdAndDelete(req.params.id);
+      const empresa = await empresa.findByIdAndDelete(req.params.id);
+
+      if (!empresa) {
+        return res.status(404).json({ message: 'Empresa não encontrada' });
+      }
+
       res.status(200).send("Empresa excluído com sucesso");
     } catch (error) {
       res

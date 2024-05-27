@@ -1,6 +1,5 @@
 import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
-import { empresaSchema } from "./Empresa.js";
 
 const vestidoSchema = new mongoose.Schema({
     id: {type: ObjectId}, //id
@@ -22,4 +21,4 @@ const vestidoSchema = new mongoose.Schema({
 
 const vestido = mongoose.model("vestidos", vestidoSchema);
 
-export default vestido;
+export {vestido, vestidoSchema};
