@@ -1,4 +1,5 @@
 import { usuario } from "../models/Users.js";
+import bcrypt from "bcrypt";
 
 
 class UsuarioController {
@@ -29,10 +30,39 @@ class UsuarioController {
     }
   }
 
+  static async postLogin(req, res) {
+    const { email, password } = req.body;
+
+    try {
+      const login = await usuario.findOne({ email });
+
+      if (!login) {
+        return res.status(404).json({ message: 'Usuário não encontrado' });
+      }
+
+      const isValidPassword = await bcrypt.compare(password, login.password);
+
+      if (!isValidPassword) {
+        return res.status(401).json({ message: 'Senha inválida' });
+      }
+
+      // const token = jwt.sign({ id: login._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+      // res.json({token});
+      res.json({ message: 'Logado!' });
+
+
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: `${error.message} - falha ao fazer login` });
+    }
+  };
+
   static async postCreateUsuario(req, res) {
     try {
-      console.log(req.body.address);
-      const novoUsuario = await usuario.create(req.body);
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(req.body.password, salt);
+      const novoUsuario = await usuario.create({ ...req.body, password: hashedPassword });
       res.status(201).json({
         message: "Usuario cadastrado com sucesso",
         usuario: novoUsuario,
