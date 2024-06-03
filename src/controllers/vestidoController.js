@@ -31,6 +31,45 @@ class VestidoController {
     }
   }
 
+
+  static async getBuscarVestidos (req, res){
+    const busca = req.query.vestido;
+    try {
+      const vestidos = await vestido.find({
+        $or:[
+          { nome: new RegExp(busca, 'i') },
+          { descricao: new RegExp(busca, 'i') },
+          { cor: new RegExp(busca, 'i') },
+          { tamanho: new RegExp(busca, 'i') },
+          { tipoEvento: new RegExp(busca, 'i') },
+          { modelo: new RegExp(busca, 'i') },
+          { comprimento: new RegExp(busca, 'i') },          
+          { tecido: new RegExp(busca, 'i') }
+        ]
+      }).populate('location_id');
+
+       // Converte o campo location_id de Buffer para string hexadecimal para cada vestido
+       const response = vestidos.map(vestido => {
+        let locationIdString = '';
+        if (vestido.location_id && vestido.location_id.buffer && vestido.location_id.buffer.data) {
+          locationIdString = Buffer.from(vestido.location_id.buffer.data).toString('hex');
+        }
+
+        return {
+          ...vestido._doc,
+          location_id: {
+            ...vestido.location_id._doc,
+            buffer: locationIdString
+          }
+        };
+      });
+
+      res.status(200).json(response);
+    } catch (error) {
+      res.status(500).json({ message: `${error.message} - falha ao buscar vestidos` });
+    }
+  }
+
   static async getVestidoById(req, res) {
     try {
       const vestidoId = await vestido.findById(req.params.id).populate('location_id');
