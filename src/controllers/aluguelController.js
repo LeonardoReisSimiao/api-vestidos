@@ -9,7 +9,7 @@ class AluguelController {
     try {
       const rentals = await aluguel.find().populate('user_id').populate('vestido_id').populate('location_id');
 
-      // Converte o campo location_id de Buffer para string hexadecimal para cada vestido
+      /* Converte o campo location_id de Buffer para string hexadecimal para cada vestido
       const response = rentals.map(rental => {
         let locationIdString = '';
         let userIdString = '';
@@ -39,9 +39,9 @@ class AluguelController {
             buffer: locationIdString
           }
         };
-      });
+      });*/
 
-      res.status(200).json(response);
+      res.status(200).json(rentals);
     } catch (error) {
       res
         .status(500)
