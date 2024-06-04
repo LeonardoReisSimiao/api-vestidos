@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 import addressSchema from "./Address.js";
 
 const usuarioSchema = new mongoose.Schema({

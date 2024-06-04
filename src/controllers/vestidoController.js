@@ -3,7 +3,7 @@ import { empresa } from "../models/Empresa.js";
 
 
 class VestidoController {
-  static async getListarVestidos(req, res) {
+  static getListarVestidos = async (req, res) => {
     try {
       const vestidos = await vestido.find().populate('location_id').exec();
 
@@ -16,7 +16,7 @@ class VestidoController {
   }
 
 
-  static async getBuscarVestidos(req, res) {
+  static getBuscarVestidos = async (req, res) => {
     const busca = req.query.vestido;
     try {
       const response = await vestido.find({
@@ -38,7 +38,7 @@ class VestidoController {
     }
   }
 
-  static async getVestidoById(req, res) {
+  static getVestidoById = async (req, res) => {
     try {
       const vestidoId = await vestido.findById(req.params.id).populate('location_id');
 
@@ -67,7 +67,7 @@ class VestidoController {
     }
   }
 
-  static async postCreateVestido(req, res) {
+  static postCreateVestido = async (req, res) => {
     const novoVestido = req.body;
     try {
       const empresaEncontrada = await empresa.findById(novoVestido.location_id);
@@ -84,7 +84,7 @@ class VestidoController {
     }
   }
 
-  static async putVestidoById(req, res) {
+  static putVestidoById = async (req, res) => {
     try {
       const vestidoId = await vestido.findByIdAndUpdate(req.params.id, req.body);
 
@@ -101,7 +101,7 @@ class VestidoController {
     }
   }
 
-  static async deleteVestidoById(req, res) {
+  static deleteVestidoById = async (req, res) => {
     try {
       const vestidoId = await vestido.findByIdAndDelete(req.params.id);
       if (!vestidoId) {

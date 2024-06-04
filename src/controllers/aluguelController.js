@@ -5,42 +5,9 @@ import aluguel from "../models/Rental.js";
 
 
 class AluguelController {
-  static async getListarAluguel(req, res) {
+  static getListarAluguel = async (req, res) => {
     try {
       const rentals = await aluguel.find().populate('user_id').populate('vestido_id').populate('location_id');
-
-      /* Converte o campo location_id de Buffer para string hexadecimal para cada vestido
-      const response = rentals.map(rental => {
-        let locationIdString = '';
-        let userIdString = '';
-        let vestidoIdString = '';
-        if (rental.location_id && rental.location_id.buffer && rental.location_id.buffer.data) {
-          locationIdString = Buffer.from(rental.location_id.buffer.data).toString('hex');
-        }
-        if (rental.user_id && rental.user_id.buffer && rental.user_id.buffer.data) {
-          userIdString = Buffer.from(rental.user_id.buffer.data).toString('hex');
-        }
-        if (rental.vestido_id && rental.vestido_id.buffer && rental.vestido_id.buffer.data) {
-          vestidoIdString = Buffer.from(rental.vestido_id.buffer.data).toString('hex');
-        }
-
-        return {
-          ...rental._doc,
-          user_id: {
-            ...rental.user_id._doc,
-            buffer: userIdString
-          },
-          vestido_id: {
-            ...rental.vestido_id._doc,
-            buffer: vestidoIdString
-          },
-          location_id: {
-            ...rental.location_id._doc,
-            buffer: locationIdString
-          }
-        };
-      });*/
-
       res.status(200).json(rentals);
     } catch (error) {
       res
@@ -49,7 +16,7 @@ class AluguelController {
     }
   }
 
-  static async getAluguelById(req, res) {
+  static getAluguelById = async (req, res) => {
     try {
       const rental = await aluguel.findById(req.params.id).populate('user_id').populate('vestido_id').populate('location_id');
 
@@ -57,37 +24,7 @@ class AluguelController {
         return res.status(404).json({ message: 'Reserva não encontrada' });
       }
 
-      let locationIdString = '';
-      let userIdString = '';
-      let vestidoIdString = '';
-      if (rental.location_id && rental.location_id.buffer && rental.location_id.buffer.data) {
-        locationIdString = Buffer.from(rental.location_id.buffer.data).toString('hex');
-      }
-      if (rental.user_id && rental.user_id.buffer && rental.user_id.buffer.data) {
-        userIdString = Buffer.from(rental.user_id.buffer.data).toString('hex');
-      }
-      if (rental.vestido_id && rental.vestido_id.buffer && rental.vestido_id.buffer.data) {
-        vestidoIdString = Buffer.from(rental.vestido_id.buffer.data).toString('hex');
-      }
-
-
-      const response = {
-        ...rental._doc,
-        user_id: {
-          ...rental.user_id._doc,
-          buffer: userIdString
-        },
-        vestido_id: {
-          ...rental.vestido_id._doc,
-          buffer: vestidoIdString
-        },
-        location_id: {
-          ...rental.location_id._doc,
-          buffer: locationIdString
-        }
-      };
-
-      res.status(200).json(response);
+      res.status(200).json(rental);
     } catch (error) {
       res
         .status(500)
@@ -95,7 +32,7 @@ class AluguelController {
     }
   }
 
-  static async postCreateAluguel(req, res) {
+  static postCreateAluguel = async (req, res) => {
     const novoAluguel = req.body;
     try {
       const userEncontrado = await usuario.findById(novoAluguel.user_id);
@@ -114,7 +51,7 @@ class AluguelController {
     }
   }
 
-  static async putAluguelById(req, res) {
+  static putAluguelById = async (req, res) => {
     try {
       const rental = await aluguel.findByIdAndUpdate(req.params.id, req.body);
 
@@ -130,7 +67,7 @@ class AluguelController {
     }
   }
 
-  static async deleteAluguelById(req, res) {
+  static deleteAluguelById = async (req, res) => {
     try {
       const rental = await aluguel.findByIdAndDelete(req.params.id);
 

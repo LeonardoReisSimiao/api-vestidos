@@ -15,11 +15,4 @@ conexao.once("open", () => {
   console.log("Conectado ao banco de dados");
 });
 
-
-app.delete("/vestidos/:id", (req, res) => {
-  const id = buscaVestido(req.params.id);
-  vestidos.splice(id, 1);
-  res.status(200).send("Vestido deletado com sucesso");
-});
-
 export default app;

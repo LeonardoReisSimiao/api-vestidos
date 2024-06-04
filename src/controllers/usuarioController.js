@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 
 
 class UsuarioController {
-  static async getListarUsuarios(req, res) {
+  static  getListarUsuarios = async (req, res) => {
     try {
       const listaUsuarios = await usuario.find({});
       res.status(200).json(listaUsuarios);
@@ -14,7 +14,7 @@ class UsuarioController {
     }
   }
 
-  static async getUsuarioById(req, res) {
+  static  getUsuarioById = async (req, res) =>  {
     try {
       const usuario = await usuario.findById(req.params.id);
 
@@ -30,7 +30,7 @@ class UsuarioController {
     }
   }
 
-  static async postLogin(req, res) {
+  static  postLogin = async (req, res) =>  {
     const { email, password } = req.body;
 
     try {
@@ -58,7 +58,7 @@ class UsuarioController {
     }
   };
 
-  static async postCreateUsuario(req, res) {
+  static  postCreateUsuario = async (req, res) =>  {
     try {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -74,7 +74,7 @@ class UsuarioController {
     }
   }
 
-  static async putUsuarioById(req, res) {
+  static  putUsuarioById = async (req, res) =>  {
     try {
       const usuario = await usuario.findByIdAndUpdate(req.params.id, req.body);
 
@@ -90,7 +90,7 @@ class UsuarioController {
     }
   }
 
-  static async deleteUsuarioById(req, res) {
+  static  deleteUsuarioById = async (req, res) =>  {
     try {
       const usuario = await usuario.findByIdAndDelete(req.params.id);
 

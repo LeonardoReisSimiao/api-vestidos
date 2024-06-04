@@ -2,7 +2,7 @@ import { empresa } from "../models/Empresa.js";
 
 
 class EmpresaController {
-  static async getListarEmpresas(req, res) {
+  static getListarEmpresas = async (req, res) => {
     try {
       const listaEmpresas = await empresa.find({});
       res.status(200).json(listaEmpresas);
@@ -13,7 +13,7 @@ class EmpresaController {
     }
   }
 
-  static async getEmpresaById(req, res) {
+  static getEmpresaById = async (req, res) => {
     try {
       const empresa = await empresa.findById(req.params.id);
 
@@ -29,7 +29,7 @@ class EmpresaController {
     }
   }
 
-  static async postCreateEmpresa(req, res) {
+  static postCreateEmpresa = async (req, res) => {
     try {
       console.log(req.body.address);
       const novoEmpresa = await empresa.create(req.body);
@@ -44,7 +44,7 @@ class EmpresaController {
     }
   }
 
-  static async putEmpresaById(req, res) {
+  static putEmpresaById = async (req, res) => {
     try {
       const empresa = await empresa.findByIdAndUpdate(req.params.id, req.body);
 
@@ -60,7 +60,7 @@ class EmpresaController {
     }
   }
 
-  static async deleteEmpresaById(req, res) {
+  static deleteEmpresaById = async (req, res) => {
     try {
       const empresa = await empresa.findByIdAndDelete(req.params.id);
 
