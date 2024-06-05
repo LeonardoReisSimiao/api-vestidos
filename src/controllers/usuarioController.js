@@ -1,111 +1,98 @@
 import { usuario } from "../models/Users.js";
 import bcrypt from "bcrypt";
 
-
 class UsuarioController {
-  static  getListarUsuarios = async (req, res) => {
-    try {
-      const listaUsuarios = await usuario.find({});
-      res.status(200).json(listaUsuarios);
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: `${error.message} - falha ao buscar Usuarios` });
-    }
-  }
+	static getListarUsuarios = async (req, res, next) => {
+		try {
+			const listaUsuarios = await usuario.find({});
+			res.status(200).json(listaUsuarios);
+		} catch (error) {
+			next(error);
+		}
+	};
 
-  static  getUsuarioById = async (req, res) =>  {
-    try {
-      const usuario = await usuario.findById(req.params.id);
+	static getUsuarioById = async (req, res, next) => {
+		try {
+			const user = await usuario.findById(req.params.id);
 
-      if (!usuario) {
-        return res.status(404).json({ message: 'Usuário não encontrado' });
-      }
+			if (!user) {
+				return res.status(404).json({ message: "Usuário não encontrado." });
+			}
 
-      res.status(200).json(usuario);
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: `${error.message} - falha ao buscar Usuario` });
-    }
-  }
+			res.status(200).json(user);
+		} catch (error) {
+			next(error);
+		}
+	};
 
-  static  postLogin = async (req, res) =>  {
-    const { email, password } = req.body;
+	static postLogin = async (req, res, next) => {
+		const { email, password } = req.body;
 
-    try {
-      const login = await usuario.findOne({ email });
+		try {
+			const login = await usuario.findOne({ email });
 
-      if (!login) {
-        return res.status(404).json({ message: 'Usuário não encontrado' });
-      }
+			if (!login) {
+				return res.status(404).json({ message: "Usuário não encontrado" });
+			}
 
-      const isValidPassword = await bcrypt.compare(password, login.password);
+			const isValidPassword = await bcrypt.compare(password, login.password);
 
-      if (!isValidPassword) {
-        return res.status(401).json({ message: 'Senha inválida' });
-      }
+			if (!isValidPassword) {
+				return res.status(401).json({ message: "Senha inválida" });
+			}
 
-      // const token = jwt.sign({ id: login._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-      // res.json({token});
-      res.json({ message: 'Logado!' });
+			// const token = jwt.sign({ id: login._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+			// res.json({token});
+			res.json({ message: "Logado!" });
+		} catch (error) {
+			next(error);
+		}
+	};
 
+	static postCreateUsuario = async (req, res, next) => {
+		try {
+			const salt = await bcrypt.genSalt(10);
+			const hashedPassword = await bcrypt.hash(req.body.password, salt);
+			const novoUsuario = await usuario.create({
+				...req.body,
+				password: hashedPassword,
+			});
+			res.status(201).json({
+				message: "Usuario cadastrado com sucesso",
+				usuario: novoUsuario,
+			});
+		} catch (error) {
+			next(error);
+		}
+	};
 
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: `${error.message} - falha ao fazer login` });
-    }
-  };
+	static putUsuarioById = async (req, res, next) => {
+		try {
+			const user = await usuario.findByIdAndUpdate(req.params.id, req.body);
 
-  static  postCreateUsuario = async (req, res) =>  {
-    try {
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(req.body.password, salt);
-      const novoUsuario = await usuario.create({ ...req.body, password: hashedPassword });
-      res.status(201).json({
-        message: "Usuario cadastrado com sucesso",
-        usuario: novoUsuario,
-      });
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: `${error.message} - falha ao cadastrar Usuario` });
-    }
-  }
+			if (!user) {
+				return res.status(404).json({ message: "Usuário não encontrado" });
+			}
 
-  static  putUsuarioById = async (req, res) =>  {
-    try {
-      const usuario = await usuario.findByIdAndUpdate(req.params.id, req.body);
+			res.status(200).send("Usuario atualizado com sucesso");
+		} catch (error) {
+			next(error);
+		}
+	};
 
-      if (!usuario) {
-        return res.status(404).json({ message: 'Usuário não encontrado' });
-      }
+	static deleteUsuarioById = async (req, res, next) => {
+		try {
+			const user = await usuario.findByIdAndDelete(req.params.id);
 
-      res.status(200).send("Usuario atualizado com sucesso");
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: `${error.message} - falha ao atualizar Usuario` });
-    }
-  }
+			if (!user) {
+				return res.status(404).json({ message: "Usuário não encontrado" });
+			}
 
-  static  deleteUsuarioById = async (req, res) =>  {
-    try {
-      const usuario = await usuario.findByIdAndDelete(req.params.id);
-
-      if (!usuario) {
-        return res.status(404).json({ message: 'Usuário não encontrado' });
-      }
-
-      res.status(200).send("Usuario excluído com sucesso");
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: `${error.message} - falha ao excluir Usuario` });
-    }
-  }
-
+			res.status(200).send("Usuario excluído com sucesso");
+		} catch (error) {
+			next(error);
+		}
+	};
 }
 
 export default UsuarioController;
