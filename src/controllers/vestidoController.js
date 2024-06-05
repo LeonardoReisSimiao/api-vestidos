@@ -75,6 +75,9 @@ class VestidoController {
 		const novoVestido = req.body;
 		try {
 			const empresaEncontrada = await empresa.findById(novoVestido.location_id);
+			if (!empresaEncontrada) {
+				return res.status(404).send("Empresa não encontrada");
+			}
 			const vestidoCompleto = {
 				...novoVestido,
 				location_id: { ...empresaEncontrada },

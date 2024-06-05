@@ -50,16 +50,23 @@ class UsuarioController {
 	};
 
 	static postCreateUsuario = async (req, res, next) => {
+		const { nome, email, password, phone } = req.body;
+
+		if (!nome || !email || !password || !phone) {
+			return res
+				.status(400)
+				.json({ message: "Todos os dados devem ser enviados." });
+		}
+
 		try {
 			const salt = await bcrypt.genSalt(10);
-			const hashedPassword = await bcrypt.hash(req.body.password, salt);
+			const hashedPassword = await bcrypt.hash(password, salt);
 			const novoUsuario = await usuario.create({
 				...req.body,
 				password: hashedPassword,
 			});
 			res.status(201).json({
 				message: "Usuario cadastrado com sucesso",
-				usuario: novoUsuario,
 			});
 		} catch (error) {
 			next(error);
