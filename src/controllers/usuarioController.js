@@ -1,3 +1,5 @@
+import NaoEncontrado from "../erros/NaoEncontrado.js";
+import RequisicaoIncorreta from "../erros/RequisicaoIncorreta.js";
 import { usuario } from "../models/Users.js";
 import bcrypt from "bcrypt";
 
@@ -16,57 +18,55 @@ class UsuarioController {
 			const user = await usuario.findById(req.params.id);
 
 			if (!user) {
-				return res.status(404).json({ message: "Usuário não encontrado." });
+				next(new NaoEncontrado("Usuario não encontrado."));
+			} else {
+				res.status(200).json(user);
 			}
-
-			res.status(200).json(user);
 		} catch (error) {
 			next(error);
 		}
 	};
 
 	static postLogin = async (req, res, next) => {
-		const { email, password } = req.body;
+		const { email, cpf, password } = req.body;
 
 		try {
-			const login = await usuario.findOne({ email });
+			const login = await usuario.findOne({ $or: [{ email }, { cpf }] });
 
 			if (!login) {
-				return res.status(404).json({ message: "Usuário não encontrado" });
+				return next(new NaoEncontrado("Usuario não encontrado."));
 			}
 
 			const isValidPassword = await bcrypt.compare(password, login.password);
 
 			if (!isValidPassword) {
-				return res.status(401).json({ message: "Senha inválida" });
+				return res.status(401).json({ mensagem: "Senha inválida" });
+			} else {
+				//const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+				//	expiresIn: "1d",
+				//});
+				return res.json({ mensagem: "Logado!" }); //,token });
 			}
-
-			// const token = jwt.sign({ id: login._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-			// res.json({token});
-			res.json({ message: "Logado!" });
 		} catch (error) {
 			next(error);
 		}
 	};
 
 	static postCreateUsuario = async (req, res, next) => {
-		const { nome, email, password, phone } = req.body;
+		const { password, passwordConfirm } = req.body;
 
-		if (!nome || !email || !password || !phone) {
-			return res
-				.status(400)
-				.json({ message: "Todos os dados devem ser enviados." });
+		if (password !== passwordConfirm) {
+			return next(new RequisicaoIncorreta("Senhas não coincidem."));
 		}
-
 		try {
 			const salt = await bcrypt.genSalt(10);
 			const hashedPassword = await bcrypt.hash(password, salt);
-			const novoUsuario = await usuario.create({
+			await usuario.create({
 				...req.body,
 				password: hashedPassword,
 			});
 			res.status(201).json({
-				message: "Usuario cadastrado com sucesso",
+				mensagem: "Usuario cadastrado com sucesso",
 			});
 		} catch (error) {
 			next(error);
@@ -78,7 +78,7 @@ class UsuarioController {
 			const user = await usuario.findByIdAndUpdate(req.params.id, req.body);
 
 			if (!user) {
-				return res.status(404).json({ message: "Usuário não encontrado" });
+				next(new NaoEncontrado("Usuário não encontrado."));
 			}
 
 			res.status(200).send("Usuario atualizado com sucesso");
@@ -92,7 +92,7 @@ class UsuarioController {
 			const user = await usuario.findByIdAndDelete(req.params.id);
 
 			if (!user) {
-				return res.status(404).json({ message: "Usuário não encontrado" });
+				next(new NaoEncontrado("Usuário não encontrado."));
 			}
 
 			res.status(200).send("Usuario excluído com sucesso");

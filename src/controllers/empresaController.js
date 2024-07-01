@@ -1,4 +1,6 @@
+import NaoEncontrado from "../erros/NaoEncontrado.js";
 import { empresa } from "../models/Empresa.js";
+import DadoExistente from "../erros/DadoExistente.js";
 
 class EmpresaController {
 	static getListarEmpresas = async (req, res, next) => {
@@ -12,13 +14,13 @@ class EmpresaController {
 
 	static getEmpresaById = async (req, res, next) => {
 		try {
-			const empresa = await empresa.findById(req.params.id);
+			const dadosEmpresa = await empresa.findById(req.params.id);
 
-			if (!empresa) {
-				return res.status(404).json({ message: "Empresa não encontrada" });
+			if (!dadosEmpresa) {
+				next(new NaoEncontrado("Empresa não encontrada"));
+			} else {
+				res.status(200).json(dadosEmpresa);
 			}
-
-			res.status(200).json(empresa);
 		} catch (error) {
 			next(error);
 		}
@@ -26,12 +28,19 @@ class EmpresaController {
 
 	static postCreateEmpresa = async (req, res, next) => {
 		try {
-			console.log(req.body.address);
-			const novoEmpresa = await empresa.create(req.body);
-			res.status(201).json({
-				message: "Empresa cadastrado com sucesso",
-				empresa: novoEmpresa,
+			const { email, cnpj } = req.body;
+
+			const dadosExistentes = await empresa.findOne({
+				$or: [{ cnpj }, { email }],
 			});
+			if (dadosExistentes) {
+				next(new DadoExistente("Estes dados já estão sendo utilzados"));
+			} else {
+				const novoEmpresa = await empresa.create(req.body);
+
+				// inserir validador cnpj
+				res.status(201).send("Empresa cadastrada com sucesso");
+			}
 		} catch (error) {
 			next(error);
 		}
@@ -39,13 +48,15 @@ class EmpresaController {
 
 	static putEmpresaById = async (req, res, next) => {
 		try {
-			const empresa = await empresa.findByIdAndUpdate(req.params.id, req.body);
+			const empresaAtualizada = req.body;
+			empresaAtualizada.updated_at = new Date();
+			await empresa.findByIdAndUpdate(req.params.id, empresaAtualizada);
 
-			if (!empresa) {
-				return res.status(404).json({ message: "Empresa não encontrada" });
+			if (!empresaAtualizada) {
+				next(new NaoEncontrado("Empresa não encontrada."));
+			} else {
+				res.status(200).send("Empresa atualizada com sucesso");
 			}
-
-			res.status(200).send("Empresa atualizado com sucesso");
 		} catch (error) {
 			next(error);
 		}
@@ -53,13 +64,18 @@ class EmpresaController {
 
 	static deleteEmpresaById = async (req, res, next) => {
 		try {
-			const empresa = await empresa.findByIdAndDelete(req.params.id);
+			const empresaExcluida = await empresa.findByIdAndDelete(req.params.id);
 
-			if (!empresa) {
-				return res.status(404).json({ message: "Empresa não encontrada" });
+			//fazer busca pelos vestidos da empresa e desativar eles
+			//desativar a empresa por 1 mês e depois realizar a exlusão dos dados
+			//fazer endpoint para reativação da empresa.
+			//salvar os dados da empresa em
+
+			if (!empresaExcluida) {
+				next(new NaoEncontrado("Empresa não encontrada"));
+			} else {
+				return res.status(200).send("Empresa deletada com sucesso");
 			}
-
-			res.status(200).send("Empresa excluído com sucesso");
 		} catch (error) {
 			next(error);
 		}

@@ -2,6 +2,7 @@ import express from "express";
 import conectaNoBD from "./config/dbConnect.js";
 import routes from "./routes/index.js";
 import manipuladorDeErros from "./middleswares/manipuladorDeErros.js";
+import manipulador404 from "./middleswares/manipulador404.js";
 
 const conexao = await conectaNoBD();
 
@@ -15,6 +16,8 @@ conexao.once("open", () => {
 const app = express();
 app.use(express.json());
 routes(app);
+
+app.use(manipulador404);
 
 app.use(manipuladorDeErros);
 

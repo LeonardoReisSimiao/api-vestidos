@@ -50,12 +50,15 @@ const vestidoSchema = new mongoose.Schema(
 			ref: "empresas",
 			required: [true, "A empresa do vestido é obrigatório"],
 		}, //objeto da empresa de locação
-		created_at: { type: Date, default: Date.now }, // data de criação formato 2024-01-01T00:00:00.000+00:00
+		created_at: { type: Date, default: Date.now, immutable: true }, // data de criação formato 2024-01-01T00:00:00.000+00:00
 		updated_at: {
 			type: Date,
 			default: Date.now,
-			required: [true, "A data de atualizaçãodo vestido é obrigatório"],
+			required: [true, "A data de atualização do vestido é obrigatório"],
 		}, // data de modificação formato 2024-01-01T00:00:00.000+00:00
+		desativado: { type: Boolean, default: false }, // BOOLEAN APRA DIZER SE ESTÁ DESATIVADO OU NÃO
+		desativadoEm: { type: Date },
+		motivoDesativacao: String,
 	},
 	{ versionKey: false },
 );

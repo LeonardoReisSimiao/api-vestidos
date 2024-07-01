@@ -8,6 +8,7 @@ const empresaSchema = new mongoose.Schema(
 		cnpj: {
 			type: String,
 			required: [true, "O CNPJ da empresa é obrigatório"],
+			unique: true,
 		},
 		nome: {
 			type: String,
@@ -16,6 +17,7 @@ const empresaSchema = new mongoose.Schema(
 		email: {
 			type: String,
 			required: [true, "O e-mail da empresa é obrigatório"],
+			unique: true,
 		},
 		phone: {
 			type: Array,
@@ -26,7 +28,7 @@ const empresaSchema = new mongoose.Schema(
 			type: String,
 			required: [true, "O horário de atendimento da empresa é obrigatório"],
 		},
-		created_at: { type: Date, default: Date.now },
+		created_at: { type: Date, default: Date.now, immutable: true },
 		updated_at: {
 			type: Date,
 			default: Date.now,

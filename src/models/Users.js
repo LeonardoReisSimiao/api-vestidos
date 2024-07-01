@@ -22,6 +22,7 @@ const usuarioSchema = new mongoose.Schema(
 			type: String,
 			required: [true, "O CPF do(a) usuário(a) é obrigatório"],
 			unique: true,
+			immutable: true,
 		},
 		phone: {
 			type: String,
@@ -32,7 +33,7 @@ const usuarioSchema = new mongoose.Schema(
 			type: String,
 			required: [true, "O perfil do(a) usuário(a) é obrigatório"],
 		},
-		created_at: { type: Date, default: Date.now },
+		created_at: { type: Date, default: Date.now, immutable: true },
 		updated_at: {
 			type: Date,
 			default: Date.now,
