@@ -36,7 +36,7 @@ class EmpresaController {
 			if (dadosExistentes) {
 				next(new DadoExistente("Estes dados já estão sendo utilzados"));
 			} else {
-				const novoEmpresa = await empresa.create(req.body);
+				await empresa.create(req.body);
 
 				// inserir validador cnpj
 				res.status(201).send("Empresa cadastrada com sucesso");

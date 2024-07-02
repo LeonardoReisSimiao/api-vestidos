@@ -17,8 +17,6 @@ class VestidoController {
 	static getBuscarVestidos = async (req, res, next) => {
 		const busca = req.query;
 
-		console.log(busca);
-
 		try {
 			// Verifica se há um valor de busca fornecido
 			if (!busca || Object.keys(busca).length === 0) {

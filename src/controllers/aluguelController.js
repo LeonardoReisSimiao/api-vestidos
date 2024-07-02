@@ -85,7 +85,7 @@ class AluguelController {
 						location_id: { ...empresaEncontrada },
 					};
 					await aluguel.create(aluguelCompleto);
-					res.status(201).send("Reserva realizada com sucesso");
+					res.status(201).send("Reserva realizada com sucesso.");
 				}
 			}
 		} catch (error) {
@@ -96,6 +96,8 @@ class AluguelController {
 	static putAluguelById = async (req, res, next) => {
 		try {
 			const atualizaAluguel = req.body;
+
+			await aluguel.findById(req.params.id);
 
 			if (
 				await isVestidoAlugado(

@@ -40,7 +40,7 @@ export async function isVestidoAlugado(
 		});
 
 		if (
-			(alugueis.length === 0 && idAluguel === null) ||
+			alugueis.length === 0 ||
 			(alugueis.length <= 1 && alugueis[0]._id.equals(idAluguel))
 		) {
 			return 0;
