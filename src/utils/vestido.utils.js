@@ -1,7 +1,13 @@
 import Aluguel from "../models/Rental.js";
 import DadoExistente from "../erros/DadoExistente.js";
 
-export async function isVestidoAlugado(vestidoId, dataInicio, dataFim, next) {
+export async function isVestidoAlugado(
+	idVestido,
+	dataInicio,
+	dataFim,
+	next,
+	idAluguel = null,
+) {
 	try {
 		// Verifica se a data de início não é menor que a data atual
 		const dataAtual = new Date();
@@ -25,14 +31,18 @@ export async function isVestidoAlugado(vestidoId, dataInicio, dataFim, next) {
 		}
 
 		const alugueis = await Aluguel.find({
-			vestido: vestidoId,
+			vestido_id: idVestido,
 			$and: [
 				{ dataInicio: { $lte: dataFim } },
 				{ dataFim: { $gte: dataInicio } },
+				{ desativado: false },
 			],
 		});
 
-		if (!alugueis.length) {
+		if (
+			(alugueis.length === 0 && idAluguel === null) ||
+			(alugueis.length <= 1 && alugueis[0]._id.equals(idAluguel))
+		) {
 			return 0;
 		} else {
 			next(new DadoExistente("Vestido já está reservado nesse período"));

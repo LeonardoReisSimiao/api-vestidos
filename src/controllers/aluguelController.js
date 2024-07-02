@@ -4,7 +4,6 @@ import { usuario } from "../models/Users.js";
 import aluguel from "../models/Rental.js";
 import { isVestidoAlugado } from "../utils/vestido.utils.js";
 import NaoEncontrado from "../erros/NaoEncontrado.js";
-import DadoExistente from "../erros/DadoExistente.js";
 
 class AluguelController {
 	static getListarAluguel = async (req, res, next) => {
@@ -75,7 +74,6 @@ class AluguelController {
 					novoAluguel.location_id,
 				);
 				if (!userEncontrado || !vestidoEncontrado || !empresaEncontrada) {
-					console.log(userEncontrado, vestidoEncontrado, empresaEncontrada);
 					next(
 						new NaoEncontrado("Usuário, Vestido ou Empresa não foi encontrada"),
 					);
@@ -101,12 +99,14 @@ class AluguelController {
 
 			if (
 				await isVestidoAlugado(
-					req.params.id,
+					atualizaAluguel.vestido_id,
 					atualizaAluguel.dataInicio,
 					atualizaAluguel.dataFim,
+					next,
+					req.params.id,
 				)
 			) {
-				next(new DadoExistente("Vestido já está reservado nesse período"));
+				return; //return pois o erro já foi tratado no isVestidoAlugado
 			} else {
 				const userEncontrado = await usuario.findById(atualizaAluguel.user_id);
 				const vestidoEncontrado = await vestido.findById(
@@ -137,7 +137,7 @@ class AluguelController {
 		}
 	};
 
-	static deleteAluguelById = async (req, res, next) => {
+	static desativaAluguelById = async (req, res, next) => {
 		try {
 			const rental = await aluguel.findById(req.params.id);
 			if (!rental) {
@@ -159,6 +159,7 @@ class AluguelController {
 			//futuramente implemetar schema separado para o schema histórico e copiar dados antes de excluir.
 			else {
 				rental.desativado = true;
+				rental.status = "Cancelado"; // futuramente mudar para receber do front o status se cancelado ou finalizado!
 				rental.desativadoEm = new Date();
 				rental.motivoDesativacao = req.params.motivo;
 				await rental.save();
@@ -168,6 +169,46 @@ class AluguelController {
 			next(error);
 		}
 	};
+	/** PARA IMPLEMENTAR NO FUTURO
+	static deleteAluguelById = async (req, res, next) => {
+		
+			const user = await usuario.findById(userId);
+			if (!user || !user.hasPermission("desativar_aluguel")) {
+				throw new Error("Permissões insuficientes");
+			} 
+
+		//verificar se existe algum  aluguel antes de excluir o vestido
+		//verificar se existe o vestido
+		//verificar permissões do usuário (talvez implementar uma verificação global)
+		//verificador de data antes de inserir (talvez implementar uma verificação global)
+		// implementar SANITIZADOR GLOBAL - CSRF, XSS,SQL INJECTION
+		//deixar o vestido com Status "desativado" e não excluir para poder inserir no histórico
+		//futuramente implemetar schema separado para o schema histórico e copiar dados antes de excluir.
+		try {
+			// Verifica se existem aluguéis ativos para o vestido
+			const aluguelAtivo = await aluguel.exists({
+				vestido_id: req.params.id, // verificar pelo ID do vestido
+				desativado: false,
+			});
+
+			if (aluguelAtivo) {
+				// Se houver aluguéis ativos, retorna um erro
+				return next(new NaoEncontrado("O vestido possui uma reserva ativa."));
+			}
+
+			// Exclui o vestido se não houver aluguéis ativos
+			const vestidoExcluido = await vestido.findByIdAndDelete(req.params.id);
+
+			if (!vestidoExcluido) {
+				return next(new NaoEncontrado("Vestido não encontrado."));
+			}
+
+			res.status(200).send("Vestido excluído com sucesso");
+		} catch (error) {
+			// Captura erros e os passa para o próximo middleware de erro
+			next(error);
+		} 
+	};*/
 }
 
 export default AluguelController;

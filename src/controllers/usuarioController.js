@@ -65,9 +65,7 @@ class UsuarioController {
 				...req.body,
 				password: hashedPassword,
 			});
-			res.status(201).json({
-				mensagem: "Usuario cadastrado com sucesso",
-			});
+			res.status(201).send("Usuario cadastrado com sucesso");
 		} catch (error) {
 			next(error);
 		}
