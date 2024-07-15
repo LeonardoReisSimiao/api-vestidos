@@ -1,34 +1,39 @@
-import { vestido } from "../models/Vestido.js";
-import { empresa } from "../models/Empresa.js";
-import aluguel from "../models/Rental.js";
+import { vestido, empresa, aluguel } from "../models/index.js";
 import NaoEncontrado from "../erros/NaoEncontrado.js";
-
 class VestidoController {
 	static getListarVestidos = async (req, res, next) => {
 		try {
-			const vestidos = await vestido.find().populate("location_id").exec();
+			const resultadoVestidos = vestido.find();
 
-			res.status(200).json(vestidos);
+			req.resultado = resultadoVestidos;
+
+			next();
 		} catch (error) {
 			next(error);
 		}
 	};
 
 	static getBuscarVestidos = async (req, res, next) => {
-		const busca = req.query;
-
 		try {
+			const busca = req.query;
 			// Verifica se há um valor de busca fornecido
-			if (!busca || Object.keys(busca).length === 0) {
-				const vestidos = await vestido
-					.find({ desativado: { $eq: false } })
-					.populate({ path: "location_id", select: "nome" });
-				res.status(200).json({
-					message:
-						"Não foram fornecidos critérios de busca, retornando todos os vestidos.",
-					vestidos,
+			if (
+				!busca ||
+				Object.keys(busca).length === 0 ||
+				busca === "" ||
+				Object.values(busca).every((value) => value === "")
+			) {
+				const resultadoVestidos = vestido.find({
+					desativado: { $eq: false },
 				});
+
+				req.message =
+					"Não foram fornecidos critérios de busca, retornando todos os vestidos.";
+				req.resultado = resultadoVestidos;
+
+				next();
 			} else {
+				const { precoMinimo, precoMaximo, nomeEmpresa } = busca;
 				const filtros = [];
 				for (const chave in busca) {
 					if (busca.hasOwnProperty(chave) && busca[chave]) {
@@ -36,61 +41,64 @@ class VestidoController {
 						filtros.push({ [chave]: new RegExp(valor, "i") });
 					}
 				}
-
-				const vestidos = await vestido
-					.find({ $or: filtros })
-					.populate({ path: "location_id", select: "nome" });
-
-				if (vestidos.length === 0) {
-					return res
-						.status(200)
-						.json({ message: "Não há vestidos para essa busca." });
-				} else {
-					res.status(200).json(vestidos);
+				if (precoMinimo !== undefined && precoMaximo !== undefined) {
+					filtros.push({ preco: { $gte: precoMinimo, $lte: precoMaximo } });
+				} else if (precoMinimo !== undefined) {
+					filtros.push({ preco: { $gte: precoMinimo } });
+				} else if (precoMaximo !== undefined) {
+					filtros.push({ preco: { $lte: precoMaximo } });
 				}
+
+				if (nomeEmpresa !== undefined) {
+					let regexNomeEmpresa = new RegExp(nomeEmpresa, "i");
+					const idEmpresa = await empresa.findOne({ nome: regexNomeEmpresa });
+					console.log(idEmpresa);
+					if (idEmpresa) {
+						filtros.push({
+							location_id: idEmpresa._id,
+						});
+					} else {
+						next(new NaoEncontrado("Empresa não encontrada."));
+					}
+				}
+
+				const resultadoVestidos = vestido.find({
+					$or: filtros,
+					desativado: { $eq: false },
+				});
+
+				req.resultado = resultadoVestidos;
+
+				next();
 			}
 		} catch (error) {
 			next(error);
 		}
 	};
 
-	static getBuscarVestidosAtivos = async (req, res, next) => {
+	static getListarVestidosAtivos = async (req, res, next) => {
 		//BUSCA VESTIDOS ATIVOS
 		try {
-			const vestidos = await vestido
-				.find({ desativado: { $eq: false } })
-				.populate({ path: "location_id", select: "nome" });
+			const resultadoVestidos = vestido.find({ desativado: { $eq: false } });
 
-			if (
-				vestidos === null ||
-				vestidos === "" ||
-				(Array.isArray(vestidos) && vestidos.length === 0)
-			) {
-				res.status(204).json({ message: "Não há vestidos ativos." }); //Status para dizer que não há vestidos ativos
-			} else {
-				res.status(200).json(vestidos);
-			}
+			req.resultado = resultadoVestidos;
+
+			next();
 		} catch (error) {
 			next(error);
 		}
 	};
 
-	static getBuscarVestidosDesativados = async (req, res, next) => {
+	static getListarVestidosDesativados = async (req, res, next) => {
 		//BUSCA VESTIDOS DESATIVADOS
 		try {
-			const vestidos = await vestido
-				.find({ desativado: { $eq: true } })
-				.populate({ path: "location_id", select: "nome" });
+			const resultadoVestidos = vestido.find({
+				desativado: { $eq: true },
+			});
 
-			if (
-				vestidos === null ||
-				vestidos === "" ||
-				(Array.isArray(vestidos) && vestidos.length === 0)
-			) {
-				res.status(204).json({ message: "Não há vestidos desativados." }); //Status para dizer que não há vestidos desativados
-			} else {
-				res.status(200).json(vestidos);
-			}
+			req.resultado = resultadoVestidos;
+
+			next();
 		} catch (error) {
 			next(error);
 		}
@@ -98,34 +106,15 @@ class VestidoController {
 
 	static getVestidoById = async (req, res, next) => {
 		try {
-			const vestidoId = await vestido
+			const vestidos = await vestido
 				.findById(req.params.id)
 				.populate("location_id");
 
-			if (!vestidoId) {
+			if (!vestidos || (Array.isArray(vestidos) && vestidos.length === 0)) {
 				next(new NaoEncontrado("Vestido não encontrado."));
+			} else {
+				res.status(200).json(vestidos);
 			}
-
-			let locationIdString = "";
-			if (
-				vestidoId.location_id &&
-				vestidoId.location_id.buffer &&
-				vestidoId.location_id.buffer.data
-			) {
-				locationIdString = Buffer.from(
-					vestidoId.location_id.buffer.data,
-				).toString("hex");
-			}
-
-			const response = {
-				...vestidoId._doc,
-				location_id: {
-					...vestidoId.location_id._doc,
-					buffer: locationIdString,
-				},
-			};
-
-			res.status(200).json(response);
 		} catch (error) {
 			next(error);
 		}
@@ -151,12 +140,10 @@ class VestidoController {
 
 	static putVestidoById = async (req, res, next) => {
 		try {
-			const vestidoId = await vestido.findByIdAndUpdate(
-				req.params.id,
-				req.body,
-			);
+			//melhorar a verificação antes de atualizar o vestido, validadores de se estão alterando o "alugado", "desativado", "locationId"
+			const vestidos = await vestido.findByIdAndUpdate(req.params.id, req.body);
 
-			if (!vestidoId) {
+			if (!vestidos || (Array.isArray(vestidos) && vestidos.length === 0)) {
 				next(new NaoEncontrado("Vestido não encontrado."));
 			} else {
 				res.status(200).send("Vestido atualizado com sucesso");
@@ -178,15 +165,15 @@ class VestidoController {
 			// Verifica se o vestido já está ativado
 			if (!vestidoId.desativado) {
 				return res.status(400).send("O vestido já está ativado.");
+			} else {
+				// Ativa o vestido
+				vestidoId.desativado = false;
+				vestidoId.desativadoEm = null; // Limpa a data de desativação
+				vestidoId.motivoDesativacao = undefined; // Limpa o motivo de desativação
+				await vestidoId.save();
+
+				res.status(200).send("Vestido ativado com sucesso");
 			}
-
-			// Ativa o vestido
-			vestidoId.desativado = false;
-			vestidoId.desativadoEm = null; // Limpa a data de desativação
-			vestidoId.motivoDesativacao = null; // Limpa o motivo de desativação
-			await vestidoId.save();
-
-			res.status(200).send("Vestido ativado com sucesso");
 		} catch (error) {
 			// Captura erros e os passa para o próximo middleware de erro
 			next(error);
@@ -272,9 +259,9 @@ class VestidoController {
 
 			if (!vestidoExcluido) {
 				return next(new NaoEncontrado("Vestido não encontrado."));
+			} else {
+				res.status(200).send("Vestido excluído com sucesso");
 			}
-
-			res.status(200).send("Vestido excluído com sucesso");
 		} catch (error) {
 			// Captura erros e os passa para o próximo middleware de erro
 			next(error);

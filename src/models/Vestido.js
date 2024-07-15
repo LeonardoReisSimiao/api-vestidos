@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
+import autopopulate from "mongoose-autopopulate";
 
 const vestidoSchema = new mongoose.Schema(
 	{
@@ -39,6 +40,14 @@ const vestidoSchema = new mongoose.Schema(
 		preco: {
 			type: Number,
 			required: [true, "O preço do vestido é obrigatório"],
+			min: [
+				0,
+				"O preço deve ser maior que R$ 0,00 e menor que R$ 5.000,00. Preço fornecido: {VALUE}",
+			],
+			max: [
+				5000,
+				"O preço deve ser maior que R$ 0,00 e menor que R$ 5.000,00. Preço fornecido: {VALUE}",
+			],
 		}, //PREÇO EM R$
 		alugado: { type: Boolean, default: false }, // BOOLEAN APRA DIZER SE ESTÁ DISPONÍVEL OU NÃO
 		images: {
@@ -49,6 +58,7 @@ const vestidoSchema = new mongoose.Schema(
 			type: ObjectId,
 			ref: "empresas",
 			required: [true, "A empresa do vestido é obrigatório"],
+			autopopulate: { select: "nome" },
 		}, //objeto da empresa de locação
 		created_at: { type: Date, default: Date.now, immutable: true }, // data de criação formato 2024-01-01T00:00:00.000+00:00
 		updated_at: {
@@ -58,11 +68,12 @@ const vestidoSchema = new mongoose.Schema(
 		}, // data de modificação formato 2024-01-01T00:00:00.000+00:00
 		desativado: { type: Boolean, default: false }, // BOOLEAN APRA DIZER SE ESTÁ DESATIVADO OU NÃO
 		desativadoEm: { type: Date },
-		motivoDesativacao: String,
+		motivoDesativacao: { type: String },
 	},
 	{ versionKey: false },
 );
 
+vestidoSchema.plugin(autopopulate);
 const vestido = mongoose.model("vestidos", vestidoSchema);
 
 export { vestido, vestidoSchema };

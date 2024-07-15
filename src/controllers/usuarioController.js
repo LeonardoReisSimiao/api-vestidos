@@ -1,13 +1,18 @@
+import DadoExistente from "../erros/DadoExistente.js";
 import NaoEncontrado from "../erros/NaoEncontrado.js";
 import RequisicaoIncorreta from "../erros/RequisicaoIncorreta.js";
-import { usuario } from "../models/Users.js";
+import SemConteudo from "../erros/SemConteudo.js";
+import { usuario } from "../models/index.js";
 import bcrypt from "bcrypt";
 
 class UsuarioController {
 	static getListarUsuarios = async (req, res, next) => {
 		try {
-			const listaUsuarios = await usuario.find({});
-			res.status(200).json(listaUsuarios);
+			const resultadoUsuarios = await usuario.find({});
+
+			req.resultado = resultadoUsuarios;
+
+			next();
 		} catch (error) {
 			next(error);
 		}
@@ -53,19 +58,26 @@ class UsuarioController {
 	};
 
 	static postCreateUsuario = async (req, res, next) => {
-		const { password, passwordConfirm } = req.body;
-
-		if (password !== passwordConfirm) {
-			return next(new RequisicaoIncorreta("Senhas não coincidem."));
-		}
 		try {
-			const salt = await bcrypt.genSalt(10);
-			const hashedPassword = await bcrypt.hash(password, salt);
-			await usuario.create({
-				...req.body,
-				password: hashedPassword,
+			const { cpf, email, password, passwordConfirm } = req.body;
+
+			if (password !== passwordConfirm) {
+				return next(new RequisicaoIncorreta("Senhas não coincidem."));
+			}
+			const dadosExistentes = await usuario.findOne({
+				$or: [{ cpf }, { email }],
 			});
-			res.status(201).send("Usuario cadastrado com sucesso");
+			if (dadosExistentes) {
+				next(new DadoExistente("E-mail ou CPF já está sendo utilizado."));
+			} else {
+				const salt = await bcrypt.genSalt(10);
+				const hashedPassword = await bcrypt.hash(password, salt);
+				await usuario.create({
+					...req.body,
+					password: hashedPassword,
+				});
+				res.status(201).send("Usuario cadastrado com sucesso.");
+			}
 		} catch (error) {
 			next(error);
 		}
@@ -77,9 +89,9 @@ class UsuarioController {
 
 			if (!user) {
 				next(new NaoEncontrado("Usuário não encontrado."));
+			} else {
+				res.status(200).send("Usuário atualizado com sucesso.");
 			}
-
-			res.status(200).send("Usuario atualizado com sucesso");
 		} catch (error) {
 			next(error);
 		}
@@ -91,9 +103,9 @@ class UsuarioController {
 
 			if (!user) {
 				next(new NaoEncontrado("Usuário não encontrado."));
+			} else {
+				res.status(200).send("Usuário excluído com sucesso.");
 			}
-
-			res.status(200).send("Usuario excluído com sucesso");
 		} catch (error) {
 			next(error);
 		}

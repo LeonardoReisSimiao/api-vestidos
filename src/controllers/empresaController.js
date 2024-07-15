@@ -1,12 +1,16 @@
 import NaoEncontrado from "../erros/NaoEncontrado.js";
-import { empresa } from "../models/Empresa.js";
+import { empresa } from "../models/index.js";
 import DadoExistente from "../erros/DadoExistente.js";
+import SemConteudo from "../erros/SemConteudo.js";
 
 class EmpresaController {
 	static getListarEmpresas = async (req, res, next) => {
 		try {
-			const listaEmpresas = await empresa.find({});
-			res.status(200).json(listaEmpresas);
+			const resultadoEmpresas = empresa.find({});
+
+			req.resultado = resultadoEmpresas;
+
+			next();
 		} catch (error) {
 			next(error);
 		}
@@ -14,12 +18,12 @@ class EmpresaController {
 
 	static getEmpresaById = async (req, res, next) => {
 		try {
-			const dadosEmpresa = await empresa.findById(req.params.id);
+			const empresas = await empresa.findById(req.params.id);
 
-			if (!dadosEmpresa) {
+			if (!empresas || (Array.isArray(empresas) && empresas.length === 0)) {
 				next(new NaoEncontrado("Empresa não encontrada"));
 			} else {
-				res.status(200).json(dadosEmpresa);
+				res.status(200).json(empresas);
 			}
 		} catch (error) {
 			next(error);
@@ -34,11 +38,10 @@ class EmpresaController {
 				$or: [{ cnpj }, { email }],
 			});
 			if (dadosExistentes) {
-				next(new DadoExistente("Estes dados já estão sendo utilzados"));
+				next(new DadoExistente("E-mail ou CNPJ já está sendo utilizado"));
 			} else {
 				await empresa.create(req.body);
 
-				// inserir validador cnpj
 				res.status(201).send("Empresa cadastrada com sucesso");
 			}
 		} catch (error) {

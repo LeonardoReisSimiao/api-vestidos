@@ -1,4 +1,4 @@
-import Aluguel from "../models/Rental.js";
+import { aluguel } from "../models/index.js";
 import DadoExistente from "../erros/DadoExistente.js";
 
 export async function isVestidoAlugado(
@@ -30,7 +30,7 @@ export async function isVestidoAlugado(
 			return 1;
 		}
 
-		const alugueis = await Aluguel.find({
+		const alugueis = await aluguel.find({
 			vestido_id: idVestido,
 			$and: [
 				{ dataInicio: { $lte: dataFim } },

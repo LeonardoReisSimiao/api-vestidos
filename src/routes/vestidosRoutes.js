@@ -1,15 +1,21 @@
 import express from "express";
 import VestidoController from "../controllers/vestidoController.js";
+import paginar from "../middleswares/paginar.js";
 
 const routes = express.Router();
 
-routes.get("/vestidos", VestidoController.getListarVestidos);
-routes.get("/vestidos/ativos", VestidoController.getBuscarVestidosAtivos);
+routes.get("/vestidos", VestidoController.getListarVestidos, paginar);
+routes.get(
+	"/vestidos/ativos",
+	VestidoController.getListarVestidosAtivos,
+	paginar,
+);
 routes.get(
 	"/vestidos/desativados",
-	VestidoController.getBuscarVestidosDesativados,
+	VestidoController.getListarVestidosDesativados,
+	paginar,
 );
-routes.get("/vestidos/busca", VestidoController.getBuscarVestidos);
+routes.get("/vestidos/busca", VestidoController.getBuscarVestidos, paginar);
 routes.get("/vestidos/:id", VestidoController.getVestidoById);
 routes.post("/vestidos", VestidoController.postCreateVestido);
 routes.put("/vestidos/:id", VestidoController.putVestidoById);

@@ -1,20 +1,17 @@
-import { vestido } from "../models/Vestido.js";
-import { empresa } from "../models/Empresa.js";
-import { usuario } from "../models/Users.js";
-import aluguel from "../models/Rental.js";
+import { vestido, empresa, usuario, aluguel } from "../models/index.js";
 import { isVestidoAlugado } from "../utils/vestido.utils.js";
 import NaoEncontrado from "../erros/NaoEncontrado.js";
+import SemConteudo from "../erros/SemConteudo.js";
 
 class AluguelController {
 	static getListarAluguel = async (req, res, next) => {
 		//LISTA TODOS ALUGUEIS ATÉ OS DESATIVADOS
 		try {
-			const rentals = await aluguel
-				.find()
-				.populate("user_id")
-				.populate("vestido_id")
-				.populate("location_id");
-			res.status(200).json(rentals);
+			const resultadoAluguel = aluguel.find();
+
+			req.resultado = resultadoAluguel;
+
+			next();
 		} catch (error) {
 			next(error);
 		}
@@ -23,12 +20,13 @@ class AluguelController {
 	static getListarAluguelAtivos = async (req, res, next) => {
 		//LISTA ALUGUEIS QUE ESTÃO ATIVOS
 		try {
-			const rentals = await aluguel
-				.find({ desativado: { $eq: false } })
-				.populate("user_id")
-				.populate("vestido_id")
-				.populate("location_id");
-			res.status(200).json(rentals);
+			const resultadoAluguel = aluguel.find({
+				desativado: { $eq: false },
+			});
+
+			req.resultado = resultadoAluguel;
+
+			next();
 		} catch (error) {
 			next(error);
 		}
@@ -42,7 +40,7 @@ class AluguelController {
 				.populate("vestido_id")
 				.populate("location_id");
 
-			if (!rental) {
+			if (!rental || (Array.isArray(rental) && rental.length === 0)) {
 				next(new NaoEncontrado("Reserva não encontrada"));
 			} else {
 				res.status(200).json(rental);
@@ -97,8 +95,6 @@ class AluguelController {
 		try {
 			const atualizaAluguel = req.body;
 
-			await aluguel.findById(req.params.id);
-
 			if (
 				await isVestidoAlugado(
 					atualizaAluguel.vestido_id,
@@ -127,7 +123,7 @@ class AluguelController {
 						atualizaAluguel,
 					);
 
-					if (!rental) {
+					if (!rental || (Array.isArray(rental) && rental.length === 0)) {
 						next(new NaoEncontrado("Reserva não encontrada"));
 					} else {
 						res.status(200).send("Reserva atualizada com sucesso");
@@ -142,7 +138,7 @@ class AluguelController {
 	static desativaAluguelById = async (req, res, next) => {
 		try {
 			const rental = await aluguel.findById(req.params.id);
-			if (!rental) {
+			if (!rental || (Array.isArray(rental) && rental.length === 0)) {
 				next(new NaoEncontrado("Reserva não encontrada"));
 			}
 
