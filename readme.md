@@ -1,106 +1,144 @@
-# API REST para Sistema de Aluguel de Vestidos
+## Como Usar a API REST para Sistema de Aluguel de Vestidos
 
-Esta API REST está sendo desenvolvida para gerenciar um sistema de aluguel de vestidos. O objetivo é fornecer uma plataforma eficiente e escalável para a administração de itens de vestuário, clientes, reservas e outras funcionalidades essenciais para um negócio de aluguel de vestidos.
+Este projeto foi desenvolvido durante os cursos "Node.js: criando uma API Rest com Express e MongoDB" e "Node.js: lidando com buscas, filtros, paginação e erros em uma API".
+Este guia detalha como utilizar a API REST para gerenciar um sistema de aluguel de vestidos de forma eficiente e escalável. A API oferece funcionalidades para gerenciar itens de vestuário, clientes, reservas e gerar relatórios, automatizando e otimizando as operações do seu negócio.
 
-## Tecnologias Utilizadas
+## Descrição
 
-- **Node.js:** Plataforma de desenvolvimento para criar aplicações de rede escaláveis e de alta performance.
-- **Express:** Framework web para Node.js, utilizado para criar APIs de forma rápida e fácil.
-- **MongoDB:** Banco de dados NoSQL utilizado para armazenar dados de forma flexível e escalável.
-- **Mongoose:** Biblioteca para modelar dados em MongoDB, fornecendo uma interface robusta e intuitiva.
-- **Dotenv:** Biblioteca para gerenciar variáveis de ambiente de forma segura.
+A proposta inicial das vídeo aulas era desenvolver uma API REST para uma biblioteca. No entanto, decidi me desafiar criando um sistema mais complexo, incluindo algumas verificações adicionais que não foram abordadas nos cursos.
 
-## Funcionalidades
+### Funcionalidades Implementadas
 
-A API irá oferecer uma série de funcionalidades que suportam as operações de um sistema de aluguel de vestidos:
+- **Validações**: Adicionei validadores de CPF e CNPJ para garantir a integridade dos dados.
+- **Segurança**: Implementei verificações contra ataques XSS e SQL Injection.
+- **HATEOAS**: Busquei atingir o Nível 3 — HATEOAS do Modelo de Maturidade de Richardson para APIs REST, um conceito que aprendi durante minha faculdade e tentei aplicar neste projeto.
+- **Testes Automatizados**: Utilizei o Postman para criar testes automatizados, aumentando assim a velocidade e a confiabilidade do desenvolvimento.
 
-- **Gerenciamento de Vestidos:** CRUD (Create, Read, Update, Delete) de itens de vestuário, permitindo adicionar novos vestidos, atualizar detalhes, listar e remover.
-- **Cadastro de Clientes:** Registro e gerenciamento de clientes, com dados pessoais e históricos de aluguel.
-- **Reservas:** Sistema de reservas que permite aos clientes reservar vestidos para datas específicas.
-- **Autenticação e Autorização:** Mecanismos de autenticação para garantir que apenas usuários autorizados possam acessar e modificar dados sensíveis.
+## Melhorias Futuras
 
-## Instalação e Configuração
+O código ainda possui diversos pontos de melhoria que pretendo implementar no futuro. Estes pontos estão comentados no código para referência futura.
 
-Siga os passos abaixo para configurar e iniciar o projeto.
+### Tecnologias Empregadas
 
-1. **Inicializar o Projeto Node.js:**
-    ```bash
-    npm init -y
-    ```
-    Este comando cria um novo projeto Node.js com configurações padrão.
+O desenvolvimento do sistema foi realizado utilizando as seguintes tecnologias:
 
-2. **Configurar Módulos ES6:**
-    Adicione `"type": "module"` ao arquivo `package.json` para habilitar a importação e exportação de módulos ES6.
-    ```json
-    {
-      "name": "sistema-aluguel-vestidos",
-      "version": "1.0.0",
-      "description": "",
-      "main": "index.js",
-      "type": "module",
-      "scripts": {
-        "dev": "nodemon server.js",
-        "test": "echo \"Error: no test specified\" && exit 1"
-      },
-      "keywords": [],
-      "author": "",
-      "license": "ISC"
-    }
-    ```
+* **Node.js:** Plataforma de alta performance para aplicações escaláveis.
+* **Express:** Framework web para criação rápida e fácil de APIs.
+* **MongoDB:** Banco de dados NoSQL flexível e escalável.
+* **Mongoose:** Modelagem de dados robusta e intuitiva para MongoDB.
+* **Outras:** Dotenv, Bcrypt, Eslint, Mongoose Autopopulate, Sanitize HTML, FS-Extra.
 
-3. **Iniciar o Servidor:**
-    Crie um arquivo `server.js` e adicione a seguinte linha para importar a biblioteca HTTP nativa do Node.js:
-    ```javascript
-    import http from 'http';
-    ```
+### Pré-requisitos: ###
 
-    Para iniciar o servidor, use o comando:
-    ```bash
-    node server.js
-    ```
+* Conta GitHub
+* Node.js instalado
+* MongoDB Atlas
+* Ferramenta de teste de API (opcional, mas recomendada: Postman)
 
-4. **Instalar Nodemon:**
-    Instale o Nodemon para reiniciar automaticamente o servidor após alterações no código:
-    ```bash
-    npm install nodemon@3.0.1
-    ```
+### Etapas: ###
 
-5. **Instalar Express:**
-    Instale o Express, um framework web para Node.js:
-    ```bash
-    npm install express@4.18.1
-    ```
+**1. Clonar o Repositório:**
 
-6. **Instalar MongoDB e Mongoose:**
-    Instale o MongoDB e o Mongoose para interação com o banco de dados MongoDB:
-    ```bash
-    npm install mongodb
-    npm install mongoose
-    ```
+```bash
+git clone https://github.com/LeonardoReisSimiao/api-vestidos
+cd api-vestidos
+```
 
-7. **Instalar Dotenv:**
-    Instale o Dotenv para carregar variáveis de ambiente a partir de um arquivo `.env`:
-    ```bash
-    npm install dotenv
-    ```
+**2. Instalar Dependências:**
 
-8. **Adicionar Script Nodemon em "scripts" do package.json:**
-    Adicione `"dev": "nodemon server.js"` em `"scripts"` no `package.json` para iniciar o servidor com Nodemon:
-    ```json
-    "scripts": {
-      "dev": "nodemon server.js"
-    }
-    ```
+```bash
+npm install
+```
 
-    Agora, você pode iniciar o servidor em modo de desenvolvimento com o comando:
-    ```bash
-    npm run dev
-    ```
+**3. Configurar Variáveis de Ambiente:**
 
-## Contribuição
+Crie um arquivo `.env` na raiz do projeto e adicione as seguintes variáveis de ambiente:
 
-Se você deseja contribuir para o desenvolvimento desta API, por favor, faça um fork do repositório, crie um branch para suas alterações e envie um pull request. Todas as contribuições são bem-vindas!
+```
+DB_CONNECTION_STRING=mongodb+srv://<username>:<password>@<cluster>.h1vabwu.mongodb.net/<database>?retryWrites=true&w=majority&appName=<cluster>
+```
 
-## Licença
+**4. Iniciar o Servidor:**
+
+```bash
+npm run dev
+```
+
+**5. Testar a API:**
+
+A API pode ser testada usando ferramentas como o Postman. Importe o arquivo Postman Collection disponível no repositório para visualizar as requisições e respostas da API.
+
+**6. Documentação da API**
+
+https://documenter.getpostman.com/view/35063870/2sA3kPqQUV
+
+**Documentação da API REST**
+
+Este guia detalha as rotas e funcionalidades da API REST para gerenciar um sistema de aluguel de vestidos. A API oferece recursos para gerenciar aluguéis, empresas, usuários e vestidos de forma eficiente e escalável.
+
+**Rotas:**
+
+### Aluguel
+
+| Rota | Método HTTP | Descrição | Funcionalidade |
+|---|---|---|---|
+| `/aluguel` | GET | Obter lista de aluguéis | Lista todos os aluguéis cadastrados, podendo ser paginada. |
+| `/aluguel/ativos` | GET | Obter lista de aluguéis ativos | Lista apenas os aluguéis que estão ativos, ou seja, em andamento. |
+| `/aluguel/:id` | GET | Obter aluguel por ID | Consulta um aluguel específico através do seu ID. |
+| `/aluguel` | POST | Criar novo aluguel | Cadastra um novo aluguel com as informações do cliente, vestido, data e hora da reserva. |
+| `/aluguel/:id` | PUT | Atualizar aluguel | Atualiza os dados de um aluguel existente. |
+| `/aluguel/desativa/:id` | PUT | Desativar aluguel | Desativa um aluguel, tornando-o indisponível. |
+| `/aluguel/delete/:id` | DELETE | Remover aluguel (Rota não implementada) | Remove um aluguel completamente do sistema (**Rota não implementada no momento**). |
+
+### Empresa
+
+| Rota | Método HTTP | Descrição | Funcionalidade |
+|---|---|---|---|
+| `/empresas` | GET | Obter lista de empresas | Lista todas as empresas cadastradas, podendo ser paginada. |
+| `/empresas/:id` | GET | Obter empresa por ID | Consulta uma empresa específica através do seu ID. |
+| `/empresas` | POST | Criar nova empresa | Cadastra uma nova empresa com as informações de nome, CNPJ, endereço e telefone. |
+| `/empresas/:id` | PUT | Atualizar empresa | Atualiza os dados de uma empresa existente. |
+| `/empresas/:id` | DELETE | Remover empresa | Remove uma empresa completamente do sistema. |
+
+### Usuários
+
+| Rota | Método HTTP | Descrição | Funcionalidade |
+|---|---|---|---|
+| `/usuarios` | GET | Obter lista de usuários | Lista todos os usuários cadastrados, podendo ser paginada. |
+| `/usuarios/:id` | GET | Obter usuário por ID | Consulta um usuário específico através do seu ID. |
+| `/login` | POST | Fazer login | Autentica um usuário através do seu email e senha, retornando um token de acesso. |
+| `/usuarios` | POST | Criar novo usuário | Cadastra um novo usuário com as informações de nome, email, senha e tipo de usuário (cliente ou administrador). |
+| `/usuarios/:id` | PUT | Atualizar usuário | Atualiza os dados de um usuário existente. |
+| `/usuarios/:id` | DELETE | Remover usuário | Remove um usuário completamente do sistema. |
+
+### Vestidos
+
+| Rota | Método HTTP | Descrição | Funcionalidade |
+|---|---|---|---|
+| `/vestidos` | GET | Obter lista de vestidos | Lista todos os vestidos cadastrados, podendo ser paginada. |
+| `/vestidos/ativos` | GET | Obter lista de vestidos ativos | Lista apenas os vestidos que estão ativos, ou seja, disponíveis para aluguel. |
+| `/vestidos/desativados` | GET | Obter lista de vestidos desativados | Lista apenas os vestidos que estão desativados, ou seja, indisponíveis para aluguel. |
+| `/vestidos/busca` | GET | Buscar vestidos | Busca vestidos por nome, categoria, preço ou data de aquisição, podendo ser paginada. |
+| `/vestidos/:id` | GET | Obter vestido por ID | Consulta um vestido específico através do seu ID. |
+| `/vestidos` | POST | Criar novo vestido | Cadastra um novo vestido com as informações de nome, categoria, preço, descrição, cor, tamanho e imagens. |
+| `/vestidos/:id` | PUT | Atualizar vestido | Atualiza os dados de um vestido existente. |
+| `/vestidos/ativa/:id` | PUT | Ativar vestido | Ativa um vestido que está desativado, tornando-o disponível para aluguel. |
+| `/vestidos/desativa/:id` | PUT | Desativar vestido | Desativa um vestido que está ativo, tornando-o indisponível para aluguel. |
+
+
+
+### Contribuição
+
+Se você deseja contribuir para o desenvolvimento deste projeto, por favor, faça um fork do repositório, crie um branch para suas alterações e envie um pull request. Todas as contribuições são bem-vindas!
+
+### Licença
 
 Este projeto está licenciado sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+
+### Contato
+
+Sinta-se à vontade para entrar em contato se tiver dúvidas ou precisar de ajuda.
+
+**[Leonardo Reis Simião](https://github.com/LeonardoReisSimiao)**
+
+**[Perfil do LinkedIn](https://www.linkedin.com/in/leonardo-simiao/)**
