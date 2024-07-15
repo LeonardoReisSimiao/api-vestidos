@@ -8,7 +8,7 @@ import bcrypt from "bcrypt";
 class UsuarioController {
 	static getListarUsuarios = async (req, res, next) => {
 		try {
-			const resultadoUsuarios = await usuario.find({});
+			const resultadoUsuarios = usuario.find({});
 
 			req.resultado = resultadoUsuarios;
 
@@ -20,12 +20,15 @@ class UsuarioController {
 
 	static getUsuarioById = async (req, res, next) => {
 		try {
-			const user = await usuario.findById(req.params.id);
+			const resultadoUsuarios = await usuario.findById(req.params.id);
 
-			if (!user) {
+			if (
+				!resultadoUsuarios ||
+				(Array.isArray(resultadoUsuarios) && resultadoUsuarios.length === 0)
+			) {
 				next(new NaoEncontrado("Usuario não encontrado."));
 			} else {
-				res.status(200).json(user);
+				res.status(200).json(resultadoUsuarios);
 			}
 		} catch (error) {
 			next(error);

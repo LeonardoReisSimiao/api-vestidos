@@ -18,12 +18,15 @@ class EmpresaController {
 
 	static getEmpresaById = async (req, res, next) => {
 		try {
-			const empresas = await empresa.findById(req.params.id);
+			const resultadoEmpresas = await empresa.findById(req.params.id);
 
-			if (!empresas || (Array.isArray(empresas) && empresas.length === 0)) {
+			if (
+				!resultadoEmpresas ||
+				(Array.isArray(resultadoEmpresas) && resultadoEmpresas.length === 0)
+			) {
 				next(new NaoEncontrado("Empresa não encontrada"));
 			} else {
-				res.status(200).json(empresas);
+				res.status(200).json(resultadoEmpresas);
 			}
 		} catch (error) {
 			next(error);
