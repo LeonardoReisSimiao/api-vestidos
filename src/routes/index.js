@@ -5,9 +5,9 @@ import empresas from "./empresasRoutes.js";
 import aluguel from "./aluguelRoutes.js";
 
 const routes = (app) => {
-    app.route("/").get((req, res) => res.status(200).send("Curso Vestido"));
+	app.route("/").get((req, res) => res.status(200).send("Servidor Online"));
 
-    app.use(express.json(), vestidos, usuarios, empresas, aluguel);
-}
+	app.use(express.json(), vestidos, usuarios, empresas, aluguel);
+};
 
 export default routes;

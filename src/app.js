@@ -3,6 +3,7 @@ import conectaNoBD from "./config/dbConnect.js";
 import routes from "./routes/index.js";
 import manipuladorDeErros from "./middleswares/manipuladorDeErros.js";
 import manipulador404 from "./middleswares/manipulador404.js";
+import { sanitizeMiddleware } from "./middleswares/sanitizador.js";
 
 const conexao = await conectaNoBD();
 
@@ -15,6 +16,10 @@ conexao.once("open", () => {
 });
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(sanitizeMiddleware);
+
 routes(app);
 
 app.use(manipulador404);
