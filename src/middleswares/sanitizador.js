@@ -88,8 +88,6 @@ export const sanitizeMiddleware = (req, res, next) => {
 				}
 
 				obj[key] = sanitizeInput(obj[key]);
-
-				console.log(`Checking for XSS in ${key}: ${obj[key]}`);
 			} else if (typeof obj[key] === "object" && obj[key] !== null) {
 				sanitizeObject(obj[key]);
 			}
