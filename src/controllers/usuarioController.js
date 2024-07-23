@@ -35,10 +35,12 @@ class UsuarioController {
 	};
 
 	static postLogin = async (req, res, next) => {
-		const { email, cpf, password } = req.body;
+		const { user, password } = req.body;
 
 		try {
-			const login = await usuario.findOne({ $or: [{ email }, { cpf }] });
+			const login = await usuario.findOne({
+				$or: [{ email: user }, { cpf: user }],
+			});
 
 			if (!login) {
 				return next(new NaoEncontrado("Usuario não encontrado."));
