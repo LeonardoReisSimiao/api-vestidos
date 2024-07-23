@@ -1,7 +1,6 @@
 import DadoExistente from "../erros/DadoExistente.js";
 import NaoEncontrado from "../erros/NaoEncontrado.js";
 import RequisicaoIncorreta from "../erros/RequisicaoIncorreta.js";
-import SemConteudo from "../erros/SemConteudo.js";
 import { usuario } from "../models/index.js";
 import bcrypt from "bcrypt";
 

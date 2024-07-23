@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import conectaNoBD from "./config/dbConnect.js";
 import routes from "./routes/index.js";
 import manipuladorDeErros from "./middleswares/manipuladorDeErros.js";
@@ -15,6 +16,8 @@ conexao.once("open", () => {
 	console.log("Conectado ao banco de dados");
 });
 const app = express();
+
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

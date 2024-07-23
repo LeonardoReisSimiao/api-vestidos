@@ -66,6 +66,11 @@ const usuarioSchema = new mongoose.Schema(
 		address: addressSchema,
 		role: {
 			type: String,
+			enum: {
+				values: ["cliente", "editorEmpresa", "adminEmpresa", "adminGeral"],
+				message: "O tipo de usuário '{VALUE}' fornecido é inválido",
+			},
+			default: "cliente",
 			required: [true, "O perfil do(a) usuário(a) é obrigatório"],
 		},
 		created_at: { type: Date, default: Date.now, immutable: true },
