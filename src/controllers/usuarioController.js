@@ -3,6 +3,7 @@ import NaoEncontrado from "../erros/NaoEncontrado.js";
 import RequisicaoIncorreta from "../erros/RequisicaoIncorreta.js";
 import { usuario } from "../models/index.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 class UsuarioController {
 	static getListarUsuarios = async (req, res, next) => {
@@ -51,10 +52,10 @@ class UsuarioController {
 			if (!isValidPassword) {
 				return res.status(401).json({ mensagem: "Senha inválida" });
 			} else {
-				//const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-				//	expiresIn: "1d",
-				//});
-				return res.json({ mensagem: "Logado!" }); //,token });
+				const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+					expiresIn: "2h",
+				});
+				return res.json({ mensagem: "Logado!", token });
 			}
 		} catch (error) {
 			next(error);

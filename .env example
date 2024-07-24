@@ -1,1 +1,2 @@
 DB_CONNECTION_STRING=mongodb+srv://<username>:<password>@<cluster>.h1vabwu.mongodb.net/<database>?retryWrites=true&w=majority&appName=<cluster>
+JWT_SECRET=AlgumaSenha
