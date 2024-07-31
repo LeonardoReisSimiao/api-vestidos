@@ -1,6 +1,7 @@
 import express from "express";
 import VestidoController from "../controllers/vestidoController.js";
 import paginar from "../middleswares/paginar.js";
+import { verifyAndProcessImages } from "../middleswares/checaImagem.js";
 
 const routes = express.Router();
 
@@ -17,9 +18,21 @@ routes.get(
 );
 routes.get("/vestidos/busca", VestidoController.getBuscarVestidos, paginar);
 routes.get("/vestidos/:id", VestidoController.getVestidoById);
-routes.post("/vestidos", VestidoController.postCreateVestido);
-routes.put("/vestidos/:id", VestidoController.putVestidoById);
-routes.put("/vestidos/ativa/:id", VestidoController.putAtivaVestidoById);
+routes.post(
+	"/vestidos",
+	verifyAndProcessImages,
+	VestidoController.postCreateVestido,
+);
+routes.put(
+	"/vestidos/:id",
+	verifyAndProcessImages,
+	VestidoController.putVestidoById,
+);
+routes.put(
+	"/vestidos/ativa/:id",
+	verifyAndProcessImages,
+	VestidoController.putAtivaVestidoById,
+);
 routes.delete("/vestidos/desativa/:id", VestidoController.desativaVestidoById);
 routes.delete("/vestidos/delete/:id", VestidoController.deleteVestidoById);
 

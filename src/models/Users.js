@@ -74,6 +74,9 @@ const usuarioSchema = new mongoose.Schema(
 			default: "cliente",
 			required: [true, "O perfil do(a) usuário(a) é obrigatório"],
 		},
+		avatar: {
+			type: String,
+		},
 		location_id: {
 			type: ObjectId,
 			ref: "empresas",
