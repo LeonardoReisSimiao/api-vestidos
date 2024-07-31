@@ -46,7 +46,15 @@ const aluguelSchema = new mongoose.Schema(
 		status: {
 			type: String,
 			enum: {
-				values: ["Pendente", "Pago", "Ativo", "Cancelado", "Finalizado"],
+				values: [
+					"Pendente",
+					"Pago",
+					"Ativo",
+					"Cancelado",
+					"Finalizado",
+					"Lavando",
+					"Ajustando",
+				],
 				message: "O código de status '{VALUE}' fornecido é inválido",
 			},
 			default: "Pendente",
@@ -65,6 +73,9 @@ const aluguelSchema = new mongoose.Schema(
 );
 
 aluguelSchema.plugin(autopopulate);
+aluguelSchema.index({ location_id: 1 });
+aluguelSchema.index({ user_id: 2 });
+aluguelSchema.index({ vestido_id: 3 });
 const aluguel = mongoose.model("rentals", aluguelSchema);
 
 export default aluguel;

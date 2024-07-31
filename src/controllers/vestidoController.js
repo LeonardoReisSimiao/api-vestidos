@@ -127,10 +127,12 @@ class VestidoController {
 			if (!empresaEncontrada) {
 				return next(new NaoEncontrado("Empresa não encontrada."));
 			}
+
 			const vestidoCompleto = {
 				...novoVestido,
 				location_id: { ...empresaEncontrada },
 			};
+
 			await vestido.create(vestidoCompleto);
 			res.status(201).send("Vestido cadastrado com sucesso");
 		} catch (error) {

@@ -1,8 +1,8 @@
-import express from "express";
+import { Router } from "express";
 import AluguelController from "../controllers/aluguelController.js";
 import paginar from "../middleswares/paginar.js";
 
-const routes = express.Router();
+const routes = Router();
 
 routes.get("/aluguel", AluguelController.getListarAluguel, paginar);
 routes.get(

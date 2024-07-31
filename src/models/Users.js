@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
+import autopopulate from "mongoose-autopopulate";
 import addressSchema from "./Address.js";
 
 // Função de validação de CPF
@@ -67,11 +68,16 @@ const usuarioSchema = new mongoose.Schema(
 		role: {
 			type: String,
 			enum: {
-				values: ["cliente", "editorEmpresa", "adminEmpresa", "adminGeral"],
+				values: ["cliente", "adminEmpresa", "adminGeral"],
 				message: "O tipo de usuário '{VALUE}' fornecido é inválido",
 			},
 			default: "cliente",
 			required: [true, "O perfil do(a) usuário(a) é obrigatório"],
+		},
+		location_id: {
+			type: ObjectId,
+			ref: "empresas",
+			autopopulate: { select: "_id" },
 		},
 		created_at: { type: Date, default: Date.now, immutable: true },
 		updated_at: {
@@ -83,6 +89,8 @@ const usuarioSchema = new mongoose.Schema(
 	{ versionKey: false },
 );
 
+usuarioSchema.plugin(autopopulate);
+usuarioSchema.index({ location_id: 1, cpf: 1 });
 const usuario = mongoose.model("users", usuarioSchema);
 
 export { usuario, usuarioSchema };

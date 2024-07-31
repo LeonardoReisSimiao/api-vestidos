@@ -35,33 +35,6 @@ class UsuarioController {
 		}
 	};
 
-	static postLogin = async (req, res, next) => {
-		const { user, password } = req.body;
-
-		try {
-			const login = await usuario.findOne({
-				$or: [{ email: user }, { cpf: user }],
-			});
-
-			if (!login) {
-				return next(new NaoEncontrado("Usuario não encontrado."));
-			}
-
-			const isValidPassword = await bcrypt.compare(password, login.password);
-
-			if (!isValidPassword) {
-				return res.status(401).json({ mensagem: "Senha inválida" });
-			} else {
-				const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-					expiresIn: "2h",
-				});
-				return res.json({ mensagem: "Logado!", token });
-			}
-		} catch (error) {
-			next(error);
-		}
-	};
-
 	static postCreateUsuario = async (req, res, next) => {
 		try {
 			const { cpf, email, password, passwordConfirm } = req.body;

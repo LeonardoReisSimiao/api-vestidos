@@ -7,39 +7,39 @@ const vestidoSchema = new mongoose.Schema(
 		id: { type: ObjectId }, //id
 		nome: {
 			type: String,
-			required: [true, "O nome do vestido é obrigatório"],
+			required: [true, "O nome do item é obrigatório"],
 		}, //nome
 		descricao: {
 			type: String,
-			required: [true, "A descrição do vestido é obrigatório"],
+			//required: [true, "A descrição do vestido é obrigatório"],
 		}, //descricao completa
 		tamanho: {
 			type: String,
-			required: [true, "O tamanho do vestido é obrigatório"],
+			//required: [true, "O tamanho do vestido é obrigatório"],
 		}, // tamanho P,M,G 42,44 ETC
 		tipoEvento: {
 			type: String,
-			required: [true, "O tipo de evento do vestido é obrigatório"],
+			//required: [true, "O tipo de evento do vestido é obrigatório"],
 		}, //FESTA, CASAMENTO, NOIVADO, DIA A DIA, ETC
 		cor: {
-			type: String,
-			required: [true, "A cor do vestido é obrigatório"],
+			type: Array,
+			//required: [true, "A cor do vestido é obrigatório"],
 		}, // AZUL, BRANCO, ROYAL
 		modelo: {
 			type: String,
-			required: [true, "O modelo do vestido é obrigatório"],
+			//required: [true, "O modelo do vestido é obrigatório"],
 		}, //SEREIA, TOMARA QUE CAIA, ETC
 		comprimento: {
 			type: String,
-			required: [true, "O comprimento do vestido é obrigatório"],
+			//required: [true, "O comprimento do vestido é obrigatório"],
 		}, // LONGO, CURTO, MIDI, ETC
 		tecido: {
 			type: String,
-			required: [true, "O tecido do vestido é obrigatório"],
+			//required: [true, "O tecido do vestido é obrigatório"],
 		}, // SEDA,ALGODAO, ETC
 		preco: {
 			type: Number,
-			required: [true, "O preço do vestido é obrigatório"],
+			required: [true, "O preço do item é obrigatório"],
 			min: [
 				0,
 				"O preço deve ser maior que R$ 0,00 e menor que R$ 5.000,00. Preço fornecido: {VALUE}",
@@ -52,7 +52,7 @@ const vestidoSchema = new mongoose.Schema(
 		alugado: { type: Boolean, default: false }, // BOOLEAN APRA DIZER SE ESTÁ DISPONÍVEL OU NÃO
 		images: {
 			type: Array,
-			required: [true, "A imagem do vestido é obrigatório"],
+			//required: [true, "A imagem do vestido é obrigatório"],
 		}, // array de string com a url das imagens
 		location_id: {
 			type: ObjectId,
@@ -74,6 +74,7 @@ const vestidoSchema = new mongoose.Schema(
 );
 
 vestidoSchema.plugin(autopopulate);
+vestidoSchema.index({ location_id: 1 });
 const vestido = mongoose.model("vestidos", vestidoSchema);
 
 export { vestido, vestidoSchema };
